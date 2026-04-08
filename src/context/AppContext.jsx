@@ -1,5 +1,6 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import { supabase } from '../supabaseClient';
+import { MONSTERS } from '../utils/monsters';
 
 const AppContext = createContext();
 
@@ -55,7 +56,8 @@ export const AppProvider = ({ children }) => {
       setRole('student');
       setCurrentUser({ ...data, type: 'student' });
       setPoints(data.points || 0);
-      setMonster(data.monster_type ? { type: data.monster_type, level: data.monster_level } : null);
+      const fullMonsterDef = data.monster_type ? MONSTERS.find(m => m.id === data.monster_type) : null;
+      setMonster(fullMonsterDef ? { ...fullMonsterDef, level: data.monster_level || 1 } : null);
       
       const { data: stickerData } = await supabase.from('student_stickers').select('*').eq('student_id', studentId);
       if (stickerData) setStickers(stickerData);
@@ -82,8 +84,8 @@ export const AppProvider = ({ children }) => {
     setMonster(newMonster);
     if (role === 'student' && currentUser?.id) {
       await supabase.from('students').update({ 
-        monster_type: newMonster.type, 
-        monster_level: newMonster.level 
+        monster_type: newMonster.id, 
+        monster_level: newMonster.level || 1
       }).eq('id', currentUser.id);
     }
   };

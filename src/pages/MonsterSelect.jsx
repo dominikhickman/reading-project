@@ -2,19 +2,11 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppContext } from '../context/AppContext';
 import Card from '../components/Card';
+import { MONSTERS } from '../utils/monsters';
 
 const MonsterSelect = () => {
   const { setMonster } = useAppContext();
   const navigate = useNavigate();
-
-  const monsters = [
-    { id: 'dino', name: 'Dino Buddy', icon: '🦖', color: '#00A699' },
-    { id: 'dragon', name: 'Fire Dragon', icon: '🐉', color: '#FF5A5F' },
-    { id: 'alien', name: 'Space Alien', icon: '👽', color: '#2ed573' },
-    { id: 'unicorn', name: 'Magic Unicorn', icon: '🦄', color: '#9b59b6' },
-    { id: 'robot', name: 'Robo Helper', icon: '🤖', color: '#3498db' },
-    { id: 'crab', name: 'Snappy Crab', icon: '🦀', color: '#e74c3c' },
-  ];
 
   const handleSelect = (monsterDef) => {
     setMonster(monsterDef);
@@ -31,7 +23,7 @@ const MonsterSelect = () => {
       </p>
 
       <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '30px' }}>
-        {monsters.map(m => (
+        {MONSTERS.map(m => (
           <Card 
             key={m.id}
             onClick={() => handleSelect(m)}
