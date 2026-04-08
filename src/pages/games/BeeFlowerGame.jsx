@@ -22,7 +22,7 @@ const VOCABULARY = [
 const shuffleArray = (array) => [...array].sort(() => Math.random() - 0.5);
 
 const BeeFlowerGame = () => {
-  const { addPoints } = useAppContext();
+  const { addPoints, currentUser } = useAppContext();
   const navigate = useNavigate();
 
   const [roundWords, setRoundWords] = useState([]);
@@ -36,9 +36,15 @@ const BeeFlowerGame = () => {
     setMessage('');
     setMatchedWords([]);
     
-    // Pick 6 random distinct words from the vocabulary
+    // Determine number of flowers based on difficulty
+    const difficultyLevel = currentUser?.difficulty || 'Medium';
+    let targetWords = 6; // Medium default
+    if (difficultyLevel === 'Easy') targetWords = 3;
+    if (difficultyLevel === 'Hard') targetWords = 9;
+
+    // Pick random distinct words from the vocabulary
     const shuffledVocab = shuffleArray(VOCABULARY);
-    const selected = shuffledVocab.slice(0, 6);
+    const selected = shuffledVocab.slice(0, targetWords);
     
     // Shuffle the round words for the "Bee Bank"
     setRoundWords(shuffleArray(selected));
@@ -66,7 +72,7 @@ const BeeFlowerGame = () => {
         // Correct match!
         setMatchedWords(prev => {
           const newMatched = [...prev, word];
-          if (newMatched.length === 6) {
+          if (newMatched.length === roundWords.length && roundWords.length > 0) {
              setMessage('🎉 You matched all the flowers! Loading next level...');
              setSessionPoints(pts => pts + 10);
              addPoints(10);

@@ -43,10 +43,10 @@ export const AppProvider = ({ children }) => {
   }, []);
 
   const fetchClassData = async (teacherId) => {
-    // Wait for the teacher to exist or just fetch all students for now if no specific teacher RLS
     const { data } = await supabase
       .from('students')
-      .select('*');
+      .select('*')
+      .eq('teacher_id', teacherId);
     if (data) setClassData(data);
   };
 
@@ -90,6 +90,27 @@ export const AppProvider = ({ children }) => {
     }
   };
 
+  const updateStudentDifficulty = async (studentId, difficulty) => {
+    await supabase.from('students').update({ difficulty }).eq('id', studentId);
+    if (currentUser?.id) {
+      fetchClassData(currentUser.id); // Refresh teacher's class data
+    }
+  };
+
+  const addStudent = async (name) => {
+    if (role !== 'teacher' || !currentUser?.id) return;
+    
+    // We provide a generated UUID for the student since the table might not auto-generate it depending on schema defaults. 
+    // Supabase JS will auto-gen if we omit it and table has `default uuid_generate_v4()`. We'll rely on DB defaults if possible.
+    const { data, error } = await supabase.from('students').insert([
+      { name, teacher_id: currentUser.id, points: 0, reading_time_minutes: 0, success_rate_percent: 0, difficulty: 'Medium' }
+    ]).select();
+    
+    if (data) {
+      fetchClassData(currentUser.id);
+    }
+  };
+
   const value = {
     role,
     currentUser,
@@ -101,6 +122,8 @@ export const AppProvider = ({ children }) => {
     logout,
     addPoints,
     setMonster: updateMonster,
+    updateStudentDifficulty,
+    addStudent,
     setStickers,
     loading
   };

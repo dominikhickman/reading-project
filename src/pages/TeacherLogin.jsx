@@ -20,6 +20,12 @@ const TeacherLogin = () => {
       const { data, error } = await supabase.auth.signUp({ email, password });
       if (error) setError(error.message);
       else {
+        // Insert into public.teachers using the auth user's ID
+        if (data?.user) {
+          await supabase.from('teachers').insert([
+            { id: data.user.id, email, name: email.split('@')[0] }
+          ]);
+        }
         alert('Signup successful! Check your email to confirm, or login if you disabled email confirmations.');
         setIsSignUp(false);
       }

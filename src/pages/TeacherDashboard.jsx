@@ -1,10 +1,18 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useAppContext } from '../context/AppContext';
 import Card from '../components/Card';
 import Button from '../components/Button';
 
 const TeacherDashboard = () => {
-  const { classData } = useAppContext();
+  const { classData, updateStudentDifficulty, addStudent } = useAppContext();
+  const [newStudentName, setNewStudentName] = useState('');
+
+  const handleAddStudent = (e) => {
+    e.preventDefault();
+    if (!newStudentName.trim()) return;
+    addStudent(newStudentName.trim());
+    setNewStudentName('');
+  };
 
   return (
     <div className="container" style={{ padding: '20px 0' }}>
@@ -25,7 +33,21 @@ const TeacherDashboard = () => {
         </Card>
       </div>
 
-      <h2>Student Progress</h2>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+        <h2 style={{ margin: 0 }}>Student Progress</h2>
+        
+        <form onSubmit={handleAddStudent} style={{ display: 'flex', gap: '10px' }}>
+          <input 
+            type="text" 
+            placeholder="New Student Name" 
+            value={newStudentName}
+            onChange={(e) => setNewStudentName(e.target.value)}
+            style={{ padding: '10px', borderRadius: '8px', border: '1px solid #ccc', fontSize: '1rem', outline: 'none' }}
+          />
+          <Button type="submit" size="sm">Add Student</Button>
+        </form>
+      </div>
+
       <Card style={{ overflowX: 'auto' }}>
         <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
           <thead>
@@ -52,7 +74,15 @@ const TeacherDashboard = () => {
                   </span>
                 </td>
                 <td style={{ padding: '15px 10px' }}>
-                  <Button size="sm" variant="secondary">Adjust Difficulty</Button>
+                  <select 
+                    value={student.difficulty || 'Medium'} 
+                    onChange={(e) => updateStudentDifficulty(student.id, e.target.value)}
+                    style={{ padding: '8px', borderRadius: '8px', border: '1px solid #ccc', cursor: 'pointer', outline: 'none' }}
+                  >
+                    <option value="Easy">Easy</option>
+                    <option value="Medium">Medium</option>
+                    <option value="Hard">Hard</option>
+                  </select>
                 </td>
               </tr>
             ))}
