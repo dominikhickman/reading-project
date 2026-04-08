@@ -7,12 +7,14 @@ const StudentDashboard = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!monster) {
+    if (!currentUser) {
+      navigate('/student/login');
+    } else if (!monster) {
       navigate('/student/monster-select');
     }
-  }, [monster, navigate]);
+  }, [monster, currentUser, navigate]);
 
-  if (!monster) return null;
+  if (!currentUser || !monster) return null;
 
   let level = 1;
   let scale = 1;
@@ -100,6 +102,31 @@ const StudentDashboard = () => {
               }}></div>
             </div>
           </div>
+
+          <button 
+            onClick={() => navigate('/student/monster-select')}
+            style={{
+              marginTop: '25px',
+              padding: '8px 20px',
+              background: 'transparent',
+              border: '2px solid var(--primary-color)',
+              color: 'var(--primary-color)',
+              borderRadius: 'var(--radius-pill)',
+              cursor: 'pointer',
+              fontWeight: 'bold',
+              transition: 'all 0.2s'
+            }}
+            onMouseEnter={e => {
+              e.currentTarget.style.background = 'var(--primary-color)';
+              e.currentTarget.style.color = 'white';
+            }}
+            onMouseLeave={e => {
+              e.currentTarget.style.background = 'transparent';
+              e.currentTarget.style.color = 'var(--primary-color)';
+            }}
+          >
+            Change Buddy
+          </button>
         </div>
 
         {/* Massive Game Button */}
