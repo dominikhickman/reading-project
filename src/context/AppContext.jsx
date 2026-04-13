@@ -106,7 +106,10 @@ export const AppProvider = ({ children }) => {
       { name, teacher_id: currentUser.id, points: 0, reading_time_minutes: 0, success_rate_percent: 0, difficulty: 'Medium' }
     ]).select();
     
-    if (data) {
+    if (error) {
+      console.error('Failed to add student:', error);
+      alert('Failed to add student. Please check your permissions.');
+    } else if (data) {
       fetchClassData(currentUser.id);
     }
   };

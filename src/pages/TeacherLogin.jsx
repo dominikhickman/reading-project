@@ -18,16 +18,25 @@ const TeacherLogin = () => {
 
     if (isSignUp) {
       const { data, error } = await supabase.auth.signUp({ email, password });
-      if (error) setError(error.message);
-      else {
+      if (error) {
+        setError(error.message);
+      } else {
         // Insert into public.teachers using the auth user's ID
         if (data?.user) {
-          await supabase.from('teachers').insert([
+          const { error: insertError } = await supabase.from('teachers').insert([
             { id: data.user.id, email, name: email.split('@')[0] }
           ]);
+          if (insertError) {
+            console.error('Failed to create teacher profile:', insertError);
+            setError('Account created but profile setup failed. Please try logging in.');
+          } else {
+            alert('Signup successful! You can now log in.');
+            setIsSignUp(false);
+          }
+        } else {
+          alert('Signup successful! Check your email to confirm, or login if you disabled email confirmations.');
+          setIsSignUp(false);
         }
-        alert('Signup successful! Check your email to confirm, or login if you disabled email confirmations.');
-        setIsSignUp(false);
       }
     } else {
       const { data, error } = await supabase.auth.signInWithPassword({ email, password });

@@ -14,8 +14,12 @@ const StudentLogin = () => {
 
   useEffect(() => {
     const fetchTeachers = async () => {
-      const { data } = await supabase.from('teachers').select('*');
-      if (data) setTeachers(data);
+      const { data, error } = await supabase.from('teachers').select('*');
+      if (error) {
+        console.error('Failed to fetch teachers:', error);
+      } else if (data) {
+        setTeachers(data);
+      }
     };
     fetchTeachers();
   }, []);
