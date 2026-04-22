@@ -7,11 +7,14 @@ const TeacherDashboard = () => {
   const { classData, updateStudentDifficulty, addStudent } = useAppContext();
   const [newStudentName, setNewStudentName] = useState('');
 
-  const handleAddStudent = (e) => {
+  const handleAddStudent = async (e) => {
     e.preventDefault();
-    if (!newStudentName.trim()) return;
-    addStudent(newStudentName.trim());
-    setNewStudentName('');
+    const trimmedName = newStudentName.trim();
+    if (!trimmedName) return;
+    const added = await addStudent(trimmedName);
+    if (added) {
+      setNewStudentName('');
+    }
   };
 
   return (

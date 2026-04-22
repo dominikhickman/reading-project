@@ -97,21 +97,42 @@ export const AppProvider = ({ children }) => {
     }
   };
 
+  const generateFallbackUUID = () => {
+    if (typeof crypto !== 'undefined' && crypto.randomUUID) return crypto.randomUUID();
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+      const r = (Math.random() * 16) | 0;
+      const v = c === 'x' ? r : (r & 0x3) | 0x8;
+      return v.toString(16);
+    });
+  };
+
   const addStudent = async (name) => {
-    if (role !== 'teacher' || !currentUser?.id) return;
-    
-    // We provide a generated UUID for the student since the table might not auto-generate it depending on schema defaults. 
-    // Supabase JS will auto-gen if we omit it and table has `default uuid_generate_v4()`. We'll rely on DB defaults if possible.
-    const { data, error } = await supabase.from('students').insert([
-      { name, teacher_id: currentUser.id, points: 0, reading_time_minutes: 0, success_rate_percent: 0, difficulty: 'Medium' }
-    ]).select();
-    
+    if (role !== 'teacher' || !currentUser?.id) return false;
+
+    const studentRow = {
+      id: generateFallbackUUID(),
+      name,
+      teacher_id: currentUser.id,
+      points: 0,
+      reading_time_minutes: 0,
+      success_rate_percent: 0,
+      difficulty: 'Medium'
+    };
+
+    const { data, error } = await supabase.from('students').insert([studentRow]).select();
+
     if (error) {
       console.error('Failed to add student:', error);
-      alert('Failed to add student. Please check your permissions.');
-    } else if (data) {
-      fetchClassData(currentUser.id);
+      alert('Failed to add student. Please check your permissions and database schema.');
+      return false;
     }
+
+    if (data) {
+      await fetchClassData(currentUser.id);
+      return true;
+    }
+
+    return false;
   };
 
   const value = {
